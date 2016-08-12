@@ -1,0 +1,112 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: "Microsoft YaHei", "微软雅黑", Helvetica, "黑体", Arial, Tahoma;
+}
+
+.login-content {
+    width: 480px;
+    height: 400px;
+    margin: 80px auto;
+    border-radius: 6px;
+    -webkit-box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+    width: 100%;
+    height: 128px;
+    padding: 8px 0 0 0;
+}
+
+.login-header img {
+    width: 90px;
+    display: block;
+    margin: 20px auto;
+}
+
+.login-user, .login-password {
+    width: 100%;
+    height: 50px;
+    margin: 2px 0 2px 0;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.login-error {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    color: red;
+    margin-left: 100px;
+    margin-top: 20px;
+}
+
+.login-user .one, .login-password .one {
+    -webkit-flex: 1;
+    text-align: right;
+    line-height: 50px;
+    width: 20%;
+    margin-right: 4px;
+}
+
+.login-user .two, .login-password .two {
+    -webkit-flex: 5;
+    flex: 5;
+}
+
+.login-user img, .login-password img {
+    width: 35px;
+    margin-top: 11px;
+}
+
+.login-user input, .login-password input {
+    width: 100%;
+    height: 50px;
+    border: 0;
+    font-size: 14px;
+    outline: 0px;
+}
+
+hr {
+    width: 80%;
+    display: block;
+    border: 0;
+    height: 1px;
+    background: #7889f1;
+}
+
+.login-btn input {
+    width: 100%;
+    height: 50px;
+    background: #7889f1;
+    color: #fff;
+    font-size: 18px;
+    margin: 50px 0 0 0;
+    border: 1px #7889f1 solid;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    outline: 0;
+}
+
+.login-btn input:hover {
+    color: #00aaaa;
+    cursor: pointer;
+}
+
+.state1 {
+    color: #aaa;
+}
+
+.state2 {
+    color: #000;
+}
+
+.state3 {
+    color: red;
+}
+
+.state4 {
+    color: green;
+}
