@@ -1,7 +1,7 @@
 <?php
 return array(
     //应用名
-    'APP_CONTEXT_NAME' => '/klxuexi',
+    'APP_CONTEXT_NAME' => '/',
     //'配置项'=>'配置值'
     'DB_TYPE' => 'mysql',     // 数据库类型
     'DB_HOST' => '192.168.0.141', // 服务器地址
