@@ -1,0 +1,78 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+<block name="top">
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+<block name="body">
+    <script type="text/javascript">
+        $(function () {
+            $("#latestNews").addClass("select_menu");
+        });
+    </script>
+    <div class="container" style="height:450px;margin-top: 10px;" align="center">
+        <div style="height:450px;background-position:center center;background-repeat: no-repeat;background-size:100% auto;background-image: url('__PUBLIC__/img/news_03.jpg');"></div>
+    </div>
+<div class="container" style="min-height:500px;">
+
+    <div class="row block" >
+        <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 50px;">
+            <p><span style="font-size:40px;font-family:Arial;color:#02B389;">LATEST NEWS</span></p>
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">最新消息</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+    </div>
+    <div style="width: 100%;margin-left: 10px;">
+            <volist name="latestNews" id="news">
+                <div class="story-block clearfix ">
+                        <empty name="news.path_picture">
+                            <img style="float: left;margin-right: 20px" src="__PUBLIC__/images/article/4.jpg" />
+                            <else/>
+                            <img  style="float: left;margin-right: 20px"  src="__ROOT__{$news.path_picture}"   />
+                        </empty>
+                    <if condition="strpos($news['link_address'],'http') !== false">
+                      <div>
+                        <h3>
+                            <a href="{$news['link_address']}"
+                               target="_blank">{$news.title}</a>
+                            <span class="mixNewsStyleDate">{$news.create_time}</span>
+                        </h3>
+                        <p class="abstract" >{$news.summary}</p>
+                      </div><!--/.story-info-->
+                        <else/>
+                        <div>
+                            <div>
+                                <h3>
+                                    <a href="{:U('Article/latestNewsDetail',array('articleId'=>$news['articleid']),'','')}"
+                                       target="_blank">{$news.title}</a>
+                                    <span class="mixNewsStyleDate">{$news.create_time}</span>
+                                </h3>
+                            </div>
+                            <!--<div class="date" style="margin-left: 10px;">-->
+                                <!--<span class="byline" >【{$news.name|default="集团动态"}】</span>-->
+                            <!--</div>-->
+                            <p class="abstract">{$news.summary}</p>
+                        </div><!--/.story-info-->
+                    </if>
+              </div>
+                <div class="separatorLine g_separator  pic-separatorLine "></div>
+            </volist>
+
+        <div class="pages" style="text-align:center;margin-top: 10px;margin-bottom: 20px;">
+            {$page}
+        </div>
+    </div>
+</div>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

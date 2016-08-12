@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <include file="common/meta"/>
+    <include file="common/css"/>
+    <include file="common/js"/>
+    <link rel="stylesheet" href="__PUBLIC__/css/pages.css">
+    <load href="__PUBLIC__/js/qrcode.js"/>
+    <import typ="js" file="js.cookie.cookie"/>
+    <title>快乐学习官网|在线报名</title>
+    <script type="text/javascript">
+        $(function () {
+            $("#onlineOrder").addClass("selectmenu");
+            $("#{$selectedGrade}").addClass('selectSubject');
+            $("#{$selectedSubject}").addClass('selectSubject');
+            $("#{$selectedSchool}").addClass('selectSubject');
+        });
+        //搜索课程
+        function searchCourseList() {
+            var courseName = $("#search_condition").val();
+            courseName = courseName.replace(/(^\s*)|(\s*$)/g, "");
+            var $href = "{:U('course/searchCourse')}";
+            var prexUrl = $href.split(".html")[0];
+            $href = prexUrl + "/courseName/" + courseName + "/subject/All/order/true/#courseList";
+            if (courseName == '' || courseName.trim().length == 0)
+                $href = prexUrl + "/subject/All/order/true/#courseList";
+            location.href = $href;
+
+        }
+    </script>
+</head>
+<body>
+<include file="common/dxb/topbar"/>
+<include file="common/dxb/topmenu"/>
+<div style="background-size:100% auto;background-image: url('__PUBLIC__/images/dxb/574793925823508436.png');height:335px;width:100%;background-repeat: no-repeat;">
+</div>
+<div class="container">
+    <div class="dqwz">当前位置：首页&nbsp;>&nbsp;马上报班&nbsp;>&nbsp;报名</div>
+    <div class="stepbox">
+        <div style="background:#db5056;" class="step"></div>
+        <div class="stepone"><img src="__PUBLIC__/images/one.png"/></div>
+        <div class="stepword"><span style="font-size:14px; font-weight:bold;">选择课程</span><br/>
+        </div>
+    </div>
+    <div class="stepbox">
+        <div style="background:#ccc; " class="step"></div>
+        <div class="stepone"><img src="__PUBLIC__/images/two.png"/></div>
+        <div class="stepword"><span style="font-size:14px; font-weight:bold;">微信扫一扫下方的二维码</span></div>
+    </div>
+    <div class="stepbox">
+        <div style="background:#ccc; " class="step"></div>
+        <div class="stepone"><img src="__PUBLIC__/images/three.png"/></div>
+        <div class="stepword"><span style="font-size:14px; font-weight:bold;">微信支付</span></div>
+    </div>
+</div>
+
+<div class="container" id="courseList">
+    <div style="float:left;  width:100%;">
+        <table border="0" cellspacing="0" cellpadding="0" class="search_table">
+            <tr>
+                <td colspan="2">
+                    <div class="ziduan_label fl">
+                        校区：
+                    </div>
+                    <div>
+                        <ul>
+                            <li><a href="{:U('course/searchCourse#courseList',array('school'=>'All','order'=>true),'')}"
+                                   id="schoolAll">不限</a>
+                            </li>
+                            <volist name="schoolInfo" id="school">
+                                <li>
+                                    <a href="{:U('course/searchCourse#courseList',array('school'=>$school['id'],'order'=>true),'')}"
+                                       id="school{$school[id]}">{$school.display_name}</a>
+                                </li>
+                            </volist>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="ziduan_label fl">
+                        年级：
+                    </div>
+                    <div>
+                        <ul>
+                            <li><a href="{:U('course/searchCourse#courseList','grade=All','')}" id="gradeAll">不限</a>
+                            </li>
+                            <li><a href="{:U('course/searchCourse#courseList',array('grade'=>16),'')}" id="grade16">初一</a>
+                            </li>
+                            <li><a href="{:U('course/searchCourse#courseList',array('grade'=>17),'')}" id="grade17">初二</a>
+                            </li>
+                            <li><a href="{:U('course/searchCourse#courseList',array('grade'=>19),'')}" id="grade19">初三</a>
+                            </li>
+                            <li><a href="{:U('course/searchCourse#courseList',array('grade'=>26),'')}" id="grade26">高一</a>
+                            </li>
+                            <li><a href="{:U('course/searchCourse#courseList',array('grade'=>21),'')}" id="grade21">高二</a>
+                            </li>
+                            <li><a href="{:U('course/searchCourse#courseList',array('grade'=>18),'')}" id="grade18">高三</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="ziduan_label fl">
+                        科目：
+                    </div>
+                    <div>
+                        <ul>
+                            <li><a href="{:U('course/searchCourse#courseList','subject=All','')}"
+                                   id="subjectAll">不限</a>
+                            </li>
+                            <li>
+                                <a href="{:U('course/searchCourse#courseList',array('subject'=>8),'')}"
+                                   id="subject8">数学</a></li>
+                            <li>
+                                <a href="{:U('course/searchCourse#courseList',array('subject'=>6),'')}"
+                                   id="subject6">英语</a></li>
+                            <li>
+                                <a href="{:U('course/searchCourse#courseList',array('subject'=>9),'')}"
+                                   id="subject9">物理</a></li>
+                            <li>
+                                <a href="{:U('course/searchCourse#courseList',array('subject'=>7),'')}"
+                                   id="subject7">生物</a></li>
+                            <li>
+                                <a href="{:U('course/searchCourse#courseList',array('subject'=>5),'')}"
+                                   id="subject5">语文</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2" style="height: 50px;">
+                    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4" style="float:right;">
+                        <div class="input-group">
+                            <input style="display: block;" placeholder="请输入课程名" class="form-control" type="text"
+                                   id="search_condition" value="{$courseName}">
+                            <span class="input-group-btn"><button class="btn btn-default bootstrap-touchspin-up"
+                                                                  onclick="searchCourseList()"
+                                                                  type="button"><i class="fa fa-search"></i>
+                            </button></span>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </table>
+    </div>
+    <div class="linebg"></div>
+    <form id="form1" name="form1" method="post" action="">
+        <volist name="courseList" id="course">
+            <div>
+                <div class="row" style="font-size:14px; font-weight:bold;padding: 15px;">{$course.display_name}</div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <a href="{:U('course/showCourseDetail',array('courseId'=>$course['id']))}">
+                            <img src="__ROOT__{$course.path_picture}" style="width:100%;height:auto;"/>
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <p>{$course.course_time_desc}</p>
+                        <p style="color:#aaa;">{$course.summary}
+                            <a href="{:U('course/showCourseDetail',array('courseId'=>$course['id']))}">【详情】</a></p>
+                        <p>地点：{$course.course_place}</p>
+                    </div>
+                    <div class="col-md-2">
+                        <p style="font-size:16px; color:#ff0000; font-weight:bold;">{$course.total_price}￥</p>
+                        <p>
+                            <a class="btn btn-danger" courseId="{$course.id}" courseName="{$course.display_name}"
+                               id="msbm" onclick="showPaymentModal(this)">报名</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="dotted_line"></div>
+        </volist>
+    </form>
+    <div class="pages" style="float:right; margin-top:10px;height:60px;">
+        {$page}
+    </div>
+</div>
+<include file="common/area/payment"/>
+<include file="common/dxb/footer"/>
+<script type="text/javascript">
+    function showPaymentModal($this) {
+        var $href = "<?php echo U('course/onlineOrder');?>";
+        var prexUrl = $href.split(".html")[0];
+        $href = prexUrl + "/courseId/" + $($this).attr("courseId") + "/courseName/" + $($this).attr("courseName");
+        $("#payModal").attr("to_url", $href);
+        $("#payModal").modal("toggle");
+    }
+</script>
+</body>
+</html>

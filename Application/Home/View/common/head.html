@@ -1,0 +1,67 @@
+<div class="top" align="center" style="width:100%;">
+    <div class="container">
+        <div class="select-city">
+            <a href="{:U('Index/xiamen','')}" city="xiamen">厦门</a>
+            <a href="{:U('Index/fuzhou','')}" city="fuzhou">福州</a>
+            <a href="{:U('Index/quanzhou','')}" city="quanzhou">泉州</a>
+            <a href="{:U('Index/nanchang','')}" city="nanchang">南昌</a>
+            <a href="{:U('Index/hefei','')}" city="hefei">合肥</a>
+        </div>
+        <div class="right_div" style="font-size: 16px;">
+            <img src="__PUBLIC__/images/phone3.png" style="padding-right: 10px;width:25px;"/>
+            <?php echo contactNumber();?></span>
+        </div>
+    </div>
+</div>
+<div class="nav" align="center"  style="width:100%;">
+    <!-- top开始 -->
+    <div class="nav-content container" style="margin-bottom: 5px;padding-left: 0px;">
+        <div class="col-lg-10 col-md-10 col-xs-10 col-sm-10" style="overflow: hidden;">
+            <div class="logo"  style="width:80px;">
+                <a href="__ROOT__/index.php/Home/Index/index">
+                    <img src="__PUBLIC__/images/logo.png" class="logo_img" style="width:80px;"/>
+                </a>
+            </div>
+            <ul class="nav-ul" style="height:70px;overflow: hidden;">
+                <li>
+                    <a href="{:U('Index/index')}" id="home">首页</a>
+                </li>
+                <li><a href="{:U('Teacher/index')}" id="starTeacher">星级名师</a></li>
+                <li><a href="{:U('Article/latestNews')}" id="latestNews">最新资讯</a></li>
+                <li><a href="{:U('Course/index')}" id="searchCourse">课程搜索</a></li>
+                <li><a href="{:U('School/index','')}" id="schoolQuery">校区信息</a></li>
+                <li><a href="{:U('Index/gxh','')}" id="gxh">1对1辅导</a></li>
+                <li><a href="{:U('Index/aboutus','')}" id="contactUs">关于我们</a></li>
+            </ul>
+        </div>
+        <div class = "col-lg-2 col-md-2 col-xs-2 col-sm-2">
+            <div class="input-group" style="margin-top: 18px;">
+                <input class="form-control" value="{$keywords}" name="" type="text"  style="border-color: red;width: 140px" placeholder="课程、老师、校区"/>
+                <span class="input-group-addon cur" type="button"  onclick="search();" style="background-color: red;color: #fff;border-color: red;">
+                    <i class="fa fa-search" ></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<!--top结束-->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".select-city a").each(function () {
+            var curCity = '{$cityCode}';
+            if ($(this).attr('city') == curCity) {
+                $(this).addClass('selected');
+                return;
+            }
+        });
+    });
+
+    function search() {
+        var keywords = $('.input-group .form-control').val();
+        if (keywords == '') {
+            alert('请输入搜索关键字');
+            return;
+        }
+        location.href = "{:U('Search/search')}" + "?keywords=" + keywords;
+    }
+</script>

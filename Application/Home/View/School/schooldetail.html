@@ -1,0 +1,95 @@
+<extend name="./base/base"/>
+<block name="title">
+    <title>{$title}</title>
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/css/default.css">
+    <link rel='stylesheet' type='text/css' href='__PUBLIC__/css/simplelightbox.min.css'  >
+    <!--<link rel='stylesheet' type='text/css' href='__PUBLIC__/css/demo.css' >-->
+</block>
+<block name="top">
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+<block name="body">
+    <script type="text/javascript">
+        $(function () {
+            $("#schoolQuery").addClass("select_menu");
+        });
+    </script>
+<div class="container" style="min-height: 1000px;">
+    <div class=" row block">
+        <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 30px;">
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">{$schoolInfo.org_name}</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+    </div>
+
+    <div style="float:left; width:100%; margin-top:10px;">
+        <div>
+            <div style="font-size:16px;text-align: center; margin-top:10px; width:100%;margin-left: 5px;margin-bottom: 20px">地点：{$schoolInfo.address}
+            </div>
+            <notempty name="trafficPicture.path_picture">
+                <img src="__ROOT__{$trafficPicture.path_picture}" style="width:100%;height:auto;"/>
+            </notempty>
+        </div>
+    </div>
+
+    <div class=" row block">
+        <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 30px;">
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">交通路线</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+    </div>
+    <div style="text-align: center;width:100%; margin-top:10px;font-size:16px;">
+        {$schoolInfo.traffic_route}
+    </div>
+    <div class=" row block">
+        <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 30px;">
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">校区环境</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+    </div>
+    <article class="htmleaf-container">
+        <div class="htmleaf-content">
+            <div class="img_container">
+                <div class="gallery">
+                    <volist name="envPictureInfo" id="picture">
+                            <notempty name="picture.path_picture">
+                                <a href="__ROOT__{$picture.path_picture}"><img src="__ROOT__{$picture.path_picture}" alt="" title="" /></a>
+                            </notempty>
+                    </volist>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+    <script type="text/javascript" src="__PUBLIC__/js/common/simple-lightbox.min.js"></script>
+    <script>
+        $(function(){
+            var gallery = $('.gallery a').simpleLightbox();
+        });
+    </script>
+
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

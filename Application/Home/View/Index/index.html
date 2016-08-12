@@ -1,0 +1,331 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+
+<block name="top">
+    <script type="text/javascript">
+        $(function () {
+            $("#home").addClass("select_menu");
+        })
+    </script>
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+
+<block name="banner">
+    <!--banner开始-->
+    <div style="float:left;">
+        <eq name="Think.session.cityCode" value="hefei">
+            <include file="common/hefei/topslider"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="xiamen">
+            <include file="common/xiamen/topslider"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="nanchang">
+            <include file="common/topslider"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="quanzhou">
+            <include file="common/topslider"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="fuzhou">
+            <include file="common/fuzhou/topslider"/>
+        </eq>
+    </div>
+    <!--banner结束-->
+</block>
+
+<block name="body">
+    <div style="width:100%;height:auto;overflow: hidden;">
+        <style>
+            .more_info:hover {
+                background-color: #f5f5f5;
+                cursor: pointer;
+            }
+
+            /*a:focus,a:active,a:visited,a:link{*/
+            /*border: none;*/
+            /*}*/
+
+        </style>
+        <div class="container content_area">
+            <div style="color:#666666;font-family:微软雅黑;font-size:14px;line-height:1.8;height: 200px;margin-top: 50px;margin-bottom: 50px;"
+                 align="center">
+                <p style="margin: 0px;">快乐学习教育科技集团，是福建省最大、全国最具影响力的大型教育机构之一</p>
+                <p style="margin: 0px;">旗下拥有“快乐学习”教育培训学校、“享学”网络科技、“艾酷”游学、厦门“佳音”少儿英语、“采艺”艺考项目等多个教育品牌</p>
+                <p style="margin: 0px;">我们开创独特学习方法，形成多元化品牌，改变教育业态</p>
+                <p style="margin: 0px;">三尺讲台是我们的起点，更是我们通向美好未来的桥梁</p>
+                <a href="{:U('Index/aboutus','','')}" id="contactUs">
+                    <div class="more_info"
+                         style="color: #666;width:200px;font-size:16px;border-radius:20px;border: 1px solid #ccc;font-size:18px;padding-top: 2px;padding-bottom: 2px;margin-top: 50px;">
+                        了解详情
+                    </div>
+                </a>
+            </div>
+
+
+            <div class="row block">
+                <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 30px;">
+                    <p><span style="font-size:40px;font-family:Arial;color:#02B389;">COURSE RECOMMENDATION</span></p>
+                    <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">课程推荐</span>
+                        &nbsp;———————
+                    </span>
+                    </p>
+                </div>
+            </div>
+            <style>
+                .course_pic_area:hover .course_pic {
+                    background-color: #fff;
+                    opacity: 0.4;
+                    width: 290px;
+                    height: 300px;
+                    position: absolute;
+                    top: -5px;
+                    left: 0px;
+                    cursor: pointer;
+                }
+
+                .course_pic_area:hover ._pic, .course_pic_area:hover ._pic_text {
+                    border-color: #ccc;
+                    box-shadow: 0 0 5px #ccc;
+                    -webkit-transform: scale(1.05, 1.05);
+                    -moz-transform: scale(1.05, 1.05);
+                    -transform: scale(1.05, 1.05);
+                }
+
+                .course_pic_area {
+                    transition: width 1s;
+                }
+            </style>
+            <div class="row block_content">
+                <volist name="dxbCourseImgs" id="course">
+                    <div class="col-lg-3 col-md-3 course_pic_area" style="margin-bottom: 30px;">
+                        <a href="{:U('course/showCourseDetail',array('courseId'=>$course['id']),'')}">
+                            <div style="height: 200px;margin: 0px;padding: 0px;overflow: hidden;" class="_pic">
+                                <img src="__ROOT__{$course.path_picture}"
+                                     style="width:285px;height: 200px;background-repeat: none;"/>
+                            </div>
+                            <div style="background-color: #f3f3f3;width:100%;margin: 0px;padding: 0px;"
+                                 class="_pic_text">
+                                <div style="font-size: 14px;">
+                                    <div style="padding: 10px;text-align: left;overflow: hidden;height:40px;">
+                                        {$course.display_name}
+                                    </div>
+                                </div>
+                                <div style="border:none;border-top:1px dashed #CCCCCC;margin-left: 10px;;margin-right: 10px;">
+                                </div>
+                                <div style="width:100%;padding: 10px;">
+                                <span style="color: #ff0000;font-size: 14px;">￥<span
+                                        style="font-size: 20px;font-weight: bold;">{$course.total_price}</span></span>
+                                    <span class="fr" style="line-height: 30px;"><i class="fa fa-map-marker"></i> {$course.school_name}</span>
+                                </div>
+                            </div>
+                            <div class="course_pic"></div>
+                        </a>
+                    </div>
+                </volist>
+
+            </div>
+
+            <div class="row" align="center" style="margin-bottom: 50px;margin-top: 20px;">
+                <div style="text-align: center;height: 40px;line-height: 40px;background-color: #f3f3f3;width: 300px;font-size: 14px;font-family: '宋体'"
+                     class="cur">
+                    <a href="{:U('Course/index')}">查看更多课程 <i class="fa fa-angle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div style="width:100%;height:auto;background-color: #f5f5f5;overflow: hidden;">
+        <div class="container content_area">
+            <div class="row block">
+                <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 30px;">
+                    <p><span style="font-size:40px;font-family:Arial;color:#02B389;">STAR TEACHER</span></p>
+                    <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">星级名师</span>
+                        &nbsp;———————
+                    </span>
+                    </p>
+                </div>
+            </div>
+
+            <style>
+                .teacher_pic_area:hover .teacher_pic {
+                    background-color: #f5f5f5;
+                    opacity: 0.5;
+                    width: 295px;
+                    height: 200px;
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    cursor: pointer;
+                }
+
+                .teacher_pic_area:hover ._pic {
+                    border-color: #ccc;
+                    box-shadow: 0 0 5px #ccc;
+                }
+            </style>
+            <div class="row block_content">
+                <volist name="dxbTeacherImgs" id="teacher">
+                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 15px; ">
+                        <div class="row teacher_pic_area">
+                            <div class="col-lg-6" style="height: 200px;overflow: hidden;">
+                                <a href="{:U('teacher/showTeacherDetail',array('teacherId'=>$teacher['id']),'')}"
+                                   class=" _pic">
+                                    <div style="width:285px;height:200px;background-image: url('__ROOT__{$teacher.path_picture}');background-repeat: no-repeat;"></div>
+                                    <!--<img src=""
+                                         style="width:285px;background-repeat: none;" class=""/>-->
+                                    <div class="teacher_pic"></div>
+                                </a>
+                            </div>
+                            <div class="col-lg-6 _pic_text" style="background-color: #fff;height:200px;">
+                                <div class="row" style="margin: 5px;"><span style="font-weight: bold;font-size: 16px;">{$teacher.name}</span>
+                                </div>
+                                <div class="row" style="margin: 5px;">
+                                    <?php
+                                $str = $teacher['qualifier'];
+                                if(strlen($str) == 0): echo "";
+                                else:
+                                $label = explode(',', $str);
+                                foreach ($label as $lab):
+                                preg_match_all('/./us', $lab, $match);
+                                ?>
+                                    <?php if (count($match[0]) === 2): ?>
+                                    <div class="fl"
+                                         style="margin-right:5px;font-size: 14px;padding-left:10px;padding-right:10px;border-radius: 20px;border: 1px solid #CCCCCC;width: 50px;text-align: center;height: 30px;line-height: 28px;">
+                                        <?php echo($lab); ?>
+                                    </div>
+                                    <?php else: ?>
+                                    <div class="fl"
+                                         style="margin-right:5px;font-size: 14px;padding-left:10px;padding-right:10px;border-radius: 20px;border: 1px solid #CCCCCC;width: 80px;text-align: center;height: 30px;line-height: 28px;">
+                                        <?php echo($lab); ?>
+                                    </div>
+                                    <?php endif;endforeach;endif; ?>
+                                </div>
+                                <div class="row" style="margin: 5px;font-size: 14px;">
+                                    <div style="text-indent:2em;">
+                                        <span>{$teacher.description}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </volist>
+            </div>
+            <div class="row" align="center" style="margin-bottom: 50px;margin-top: 20px;">
+                <div style="text-align: center;height: 40px;line-height: 40px;background-color: #fff;width: 300px;font-size: 14px;font-family: '宋体'"
+                     class="cur">
+                    <a href="{:U('Teacher/index')}">查看更多名师 <i class="fa fa-angle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width:100%;height:auto;overflow: hidden;">
+        <div class="container content_area">
+            <div class="row block">
+                <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 20px;">
+                    <p><span style="font-size:40px;font-family:Arial;color:#02B389;">LATEST NEWS</span></p>
+                    <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">最新消息</span>
+                        &nbsp;———————
+                    </span>
+                    </p>
+                </div>
+            </div>
+            <style>
+                .news_pic_area:hover .news_pic {
+                    background-color: #f5f5f5;
+                    opacity: 0.5;
+                    width: 590px;
+                    height: 200px;
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    cursor: pointer;
+                }
+
+                .news_pic_area:hover ._pic {
+                    border-color: #ccc;
+                    box-shadow: 0 0 5px #ccc;
+                }
+            </style>
+            <div class="row block_content">
+                <div class="col-lg-6 news_pic_area" style="padding-left:30px;padding-bottom: 30px;">
+                    <a href="{:U('Article/latestNewsDetail',array('articleId'=>110),'','')}"
+                       target="_blank" class="_pic">
+                        <div style="height: 200px;margin: 0px;padding: 0px;overflow: hidden;" class="_pic">
+                            <img src="__PUBLIC__/images/article/1467105475147164.png"
+                                 style="width:100%;height: 200px;background-repeat: none;"/>
+                        </div>
+                        <div style="margin-left:30px;padding: 0px;overflow: hidden;" class="news_pic"></div>
+
+                        <div style="height:40px;text-align: left;margin-top:30px;background-color: #fff;">
+                            <p>
+                                <span style="font-family:微软雅黑;font-size:18px;">最新野鸡大学名单曝光 我省一所正牌高校紧急辟谣</span>
+                            </p>
+                            <p>
+                                    <span style="font-family:微软雅黑;font-size:14px;color:#999999;">
+                                        最新野鸡大学名单曝光 我省一所正牌高校紧急辟谣
+                                    </span>
+                            </p>
+                        </div>
+                    </a>
+
+                </div>
+                <div class="col-lg-6" style="padding-left:30px;padding-bottom: 30px;">
+                    <volist name="indexLatestNews" id="news">
+                        <div class="row">
+                            <div>
+                                <if condition="strpos($news['link'],'http') !== false">
+                                    <a href="{$news['link']}"
+                                       target="_blank">
+                                                <span style="font-family:微软雅黑;font-size:18px;">
+                                                    {$news.title}
+                                                </span>
+                                    </a>
+                                    <else/>
+                                    <a href="{:U('Article/latestNewsDetail',array('articleId'=>$news['articleid']),'','')}"
+                                       target="_blank">
+
+                                                <span style="font-family:微软雅黑;font-size:18px;">
+                                                    {$news.title}
+                                                </span>
+                                    </a>
+                                </if>
+                            </div>
+                            <div class="row" style="margin-left:-4px;">
+                                <div style="margin-bottom: 15px;margin-left:10px;font-family:'微软雅黑';font-size:14px;color:#999999;">
+                                    {$news.summary}
+                                            <span style="margin-top: 10px;margin-bottom: 15px;font-family:'微软雅黑';font-size:14px;color:#999999;">
+                                                        {$news.create_time}
+                                            </span>
+                                </div>
+                            </div>
+                        </div>
+                    </volist>
+                </div>
+            </div>
+            <div class="row" align="center" style="margin-bottom: 50px;margin-top: 20px;">
+                <div style="margin-top:10px;text-align: center;height: 40px;line-height: 40px;background-color: #f3f3f3;width: 300px;font-size: 14px;font-family: '宋体'"
+                     class="cur">
+                    <a href="{:U('Article/latestNews')}">点击查看更多 <i class="fa fa-angle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="footer">
+    <div style="float:left; width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

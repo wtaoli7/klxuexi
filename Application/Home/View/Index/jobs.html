@@ -1,0 +1,67 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+
+<block name="top">
+    <script type="text/javascript">
+        $(function () {
+            $("#contactUs").addClass("select_menu");
+        })
+    </script>
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+
+<block name="body">
+    <div  class="container" style="height:450px;margin-top: 10px;" align="center">
+        <div style="height:450px;background-position:center center;background-repeat: no-repeat;background-size:100% auto;background-image: url('__PUBLIC__/img/about_us_01.jpg');"></div>
+    </div>
+
+    <div class="row block" id="jobs">
+        <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 50px;">
+            <p><span style="font-size:40px;font-family:Arial;color:#02B389;">ABOUT US</span></p>
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">关于我们</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+    </div>
+    <div class="container container_ab">
+        <br>
+        <div class="aside-info l">
+            <ul class="menu f14">
+                <li><a  href="aboutus#introduce" name="introduce">集团介绍</a></li>
+                <li><a href="aboutus#devp" name="devp">集团规模</a></li>
+                <li><a href="aboutus#theory" name="theory">教育理念</a></li>
+                <li><a href="aboutus#backgd" name="backgd">教育愿景</a></li>
+                <li><a class="current" href="jobs.html#jobs">人才招聘</a></li>
+                <li><a  href="contact.html#contact">联系我们</a></li>
+                <li><a href="aboutus#advise" name="advise">投诉建议</a></li>
+            </ul>
+        </div>
+        <div class="article-info r" >
+            <div class="bdr-gray lh25">
+                <h3>人才招聘</h3>
+                <p>   上海地区招聘邮箱：hr_sh@klxuexi.com   </p>
+
+                <p>   厦门地区招聘邮箱：hr_xm@klxuexi.com   </p>
+
+                <p>   福州地区招聘邮箱：hr_fz@klxuexi.com   </p>
+
+                <p>   泉州地区招聘邮箱：hr_qz@klxuexi.com   </p>
+
+                <p>   南昌地区招聘邮箱：hr_nc@klxuexi.com           </p>
+
+            </div>
+        </div>
+    </div>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

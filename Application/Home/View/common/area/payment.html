@@ -1,0 +1,242 @@
+<script type="text/javascript">
+    function verifyEmpty(id, msg)
+    {
+        if ($("#" + id).val() == '' || null == $("#" + id).val()) {
+            $("#validator_span").text(msg);
+            $("#validator_msg").show();
+            $("#" + id).focus();
+            return false;
+        }
+        return true;
+    }
+    var code="";
+    function checkCode()
+    {
+        var $URL="{:U('index/checkCode')}";
+        $.ajax({ async: false,type : "POST", url: $URL,
+            data :{ tel:$("#tel_number").val(),code:$("#verify_code").val()},
+            dataType : 'json',
+            success : function(data) {
+             if (data['status']==0) {
+                    changeStyle();
+                    $("#validator_span").text("验证码输入错误,请重新输入");
+                    $("#validator_msg").show();
+                    $("#verify_code").focus();
+                    return false;
+                }
+                else  if (data['status']==1){
+                    savePayment();
+                }
+            }
+        });
+        return true;
+    }
+    function verifyTel() {
+        if ($("#tel_number").val() == '' || !$("#tel_number").val().match(/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/)) {
+            $("#validator_span").text("手机号码不合法,请重新输入");
+            $("#validator_msg").show();
+            $("#tel_number").focus();
+            return false;
+        }
+        return true;
+    }
+    var check = true;
+
+    function changeStyle(){
+        if ($("#myAlert").hasClass("alert-warning") == false)
+            $("#myAlert").removeClass("alert-success").addClass("alert-warning");
+    }
+    function validator()
+    {
+        changeStyle();
+        check = verifyEmpty('tel_number', "手机号码不能为空!");
+        if (check == false) return false;
+        check = verifyTel();
+        if (check == false) return false;
+        check = verifyEmpty('verify_code', "验证码不能为空!");
+        if (check == false) return false;
+        check = verifyEmpty('call_name', "您的称呼不能为空!");
+        if (check == false) return false;
+        return check;
+    }
+
+    function sendSuc(content){
+        if (content['msg'] == 'OK') {
+            $("#validator_msg").show();
+            if ($("#myAlert").hasClass("alert-warning"))
+                $("#myAlert").removeClass("alert-warning").addClass("alert-success");
+            $("#validator_span").text("发送成功!");
+            resendLeftTime();
+        }
+        else {
+            $("#validator_span").html("");
+            $("#validator_span").text(content['detail']);
+            $("#validator_msg").show();
+            $("#verify_code").focus();
+            check = false;
+            return false;
+        }
+
+    }
+    //接受验证码
+    function accipteVerifyCode() {
+        if (verifyTel() == false)
+            return false;
+        var $URL="{:U('index/sendVerifyCode')}";
+        $.ajax({type: "post", url: $URL,data: {mobie: $("#tel_number").val()},dataType: "JSON",async: false,
+            success:sendSuc
+        });
+        return true;
+
+    }
+    //清除定时器
+    function deleteTask() {
+        $("#btn_verify_code").attr("disabled", false);
+        $("#btn_verify_code").html("获取验证码");
+        $("#alidator_span").text();
+        clearTimeout(timeout);//停止定时器
+        clearTimeout(goPayTimeOut);//停止定时器
+    }
+    function saveSuc(msg){
+        if (msg['status'] == 1) {
+            $("#myAlert").removeClass("alert-warning").addClass("alert-success");
+            $("#validator_msg").show();
+            deleteTask();
+            gotoPaymentPage();
+        }
+
+    }
+    function savePayment() {
+  var $URL="{:U('index/saveAppointMent')}";
+        if (validator() == false)
+            return;
+        $("#commit_btn").attr("disable", true);
+        $("#validator_msg").hide();
+        $.ajax({
+            type: "post",
+            url:$URL,
+            data: {telNumber:$("#tel_number").val(), callName:$("#call_name").val(),
+                   verifyCode:$("#verify_code").val(), type:$("#type").val()},
+                dataType: "JSON",
+                 success:saveSuc
+        });
+
+    }
+    $(function () {
+
+        $("input[type='text']").each(function () {
+            $(this).bind("change mouseover click mouseenter", function () {
+                $(this).val($(this).val().replace(/[~'!<>@#$%^`&*()-+_=:]/g, ""));
+            })
+        });
+
+        $("#commit_btn").bind("click",function(){
+            checkCode();
+        });
+    })
+
+
+    var countdown = 60;
+    var timeout;
+    function resendLeftTime() {
+        var $obj = $("#btn_verify_code");
+        if (countdown == 0) {
+            $obj.attr("disabled", false);
+            $("#btn_verify_code").html("获取验证码"); countdown = 60;
+            return;
+        } else {
+            $("#btn_verify_code").html(countdown + "秒后" + ""); $obj.attr("disabled", true);
+            countdown--;
+        }
+        timeout = setTimeout(function () { resendLeftTime() } , 1000)
+    }
+
+    var leftTime=3;
+    var goPayTimeOut;
+    function gotoPaymentPage(){
+        if (leftTime == 0) {
+            $("#commit_btn").attr("disable", false);
+            $("#payment_form")[0].reset();
+            deleteTask();
+            location.href=$("#payModal").attr("to_url");
+        }
+        else{
+            $("#validator_span").text("您的信息已验证完成!系统将在"+leftTime+"秒内进入支付页面");  leftTime--;
+            goPayTimeOut = setTimeout(function () {    gotoPaymentPage() } , 1000);
+        }
+    }
+
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="payModal" to_url="blank" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true" style="z-index: 10001;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <empty name="Think.session.city">
+                    <a class="close" href="__ROOT__/index.php/Home/Index/modalCanel">
+                        &times;
+                    </a>
+                    <else/>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                </empty>
+
+                <h4 class="modal-title" id="myModalLabel">
+                    报名信息确认：
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal"  id="payment_form"  role="form" style="width:500px;text-align: left;">
+                    <div class="form-group" id="validator_msg" style="display: none">
+                        <div id="myAlert" class="alert alert-warning" style="margin-left: 20px;">
+                            <a href="javascript:void(0)" class="close"
+                               onclick="javascript:$('#validator_msg').hide();">&times;</a>
+                            <strong id="validator_span"></strong>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">手机号<span style="color: #ff0000">*</span>:</label>
+                        <div class="col-sm-8 input-group">
+                            <input class="form-control" placeholder="请输入手机号"   name="telNumber" id="tel_number"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">校验码<span style="color: #ff0000">*</span>:</label>
+                        <div class="col-sm-8 input-group">
+                            <input class="form-control" required="required" name="verifyCode" type="text" id="verify_code">
+                                 <span class="input-group-btn">
+                                        <button class="btn btn-default" id="btn_verify_code" onclick="accipteVerifyCode();" type="button">获取验证码</button>
+                                      </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" >称 呼<span style="color: #ff0000">*</span>:</label>
+                        <div class="col-sm-8 input-group">
+                            <input class="form-control" placeholder="父亲" name="callName" required="required"
+                                   id="call_name" type="text">
+                            <input name="type" id="type" type="hidden" value="2">
+                        </div>
+                    </div>
+
+                    <div class="form-group" align="center" style="height: 30px;">
+                        <button type="button" id="commit_btn" class="btn btn-sm btn-primary" >确认报名信息
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <a class="btn  btn-danger" data-dismiss="modal" aria-hidden="true">
+                    关闭
+                </a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>

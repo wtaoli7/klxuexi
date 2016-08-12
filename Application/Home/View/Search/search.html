@@ -1,0 +1,93 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+
+<block name="top">
+    <script type="text/javascript">
+        $(function () {
+            $("#home").addClass("select_menu");
+        })
+    </script>
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+
+<block name="body">
+    <style>
+        .nav_item_sub span {
+            font-size: 12px;
+            margin: 10px;
+            float: left;
+        }
+
+        .content_area .block {
+            margin-top: 20px;
+        }
+
+        .content_area h3 {
+            padding-left: 10px;
+            border-left: 4px solid red;
+            font-family: "黑体";
+        }
+    </style>
+    <div style="width:100%;">
+        <div class="row block">
+            <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 50px;">
+                <p><span style="font-size:40px;font-family:Arial;color:#02B389;">SEARCH</span></p>
+                <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">搜索</span>
+                        &nbsp;———————
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <div style="width:100%;margin-bottom: 20px;" align="center">
+            <div class="input-group" style="width:450px;">
+                <input class="form-control ng-pristine ng-valid ng-touched" id="appendedInputButtons"
+                       value="{$keywords}" type="text">
+                <span class="input-group-addon cur" type="button" onclick="search2();"><i
+                        class="fa fa-search"></i></span>
+            </div>
+        </div>
+
+        <div class="container" id="searchResult" style="width:62%;">
+            <h3 style="margin-left: 10px">搜索结果：</h3>
+            <table class="table table-hover">
+                <tbody>
+                <volist name="result" id="res">
+                    <tr>
+                        <td>
+                            <div class="row">
+                                    <a href="<?php getURL($res['type'],$res['id']);?>" target="_blank"
+                                       class="col-lg-12">
+                                        <img class="col-lg-2" style="padding-right: 0px" src="__ROOT__/{$res.path_picture}" width="140px" height="100px"/>
+                                        <div class="col-lg-6" style="font-size: 16px;margin-top: 5px;padding-left: 0px">{$res.name}</div>
+                                    </a>
+                            </div>
+                        </td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function search2() {
+            var keywords = $('#appendedInputButtons').val();
+            if (keywords == '') {
+                alert('请输入搜索关键字');
+                return;
+            }
+            location.href = "{:U('Search/search')}" + "?keywords=" + keywords;
+        }
+    </script>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

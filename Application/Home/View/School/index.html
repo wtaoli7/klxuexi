@@ -1,0 +1,156 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+<block name="top">
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?v=1.5&ak=erlQ8QzXDGHQVmz7lhrmqeNz7EtoHGwN"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#schoolQuery").addClass("select_menu");
+        })
+    </script>
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+
+<block name="body">
+    <div class="container" style="height:450px;margin-top: 10px;" align="center">
+        <div style="height:450px;background-position:center center;background-repeat: no-repeat;background-size:100% auto;background-image: url('__PUBLIC__/img/school_02.jpg');"></div>
+    </div>
+
+    <div class="container" id="schoolinfo">
+        <div class=" row block">
+            <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 50px;">
+                <p><span style="font-size:40px;font-family:Arial;color:#02B389;">CAMPUS ADDRESS</span></p>
+                <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">校区地址</span>
+                        &nbsp;———————
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="wrapper">
+            <div class="border mt10">
+                <ul class="shaixuan">
+                    <li id="cityarea_list" class="xq_li">
+                        <a href="{:U('/home/school/index#schoolinfo')}" id="all_area" class="{$productLine?'':'mouse_on'}"
+                           style="cursor: default;"><span>全部校区</span></a>
+                        <a href="{:U('/home/school/index#schoolinfo?productLine=1')}"
+                           class="{$productLine==1?'mouse_on':''}"><span>大小班</span></a>
+                        <a href="{:U('/home/school/index#schoolinfo?productLine=2')}"
+                           class="{$productLine==2?'mouse_on':''}"><span>个性化</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="wrapper mt10" style="background-color: #E0E0E0">
+            <div class="col_left w715" style="margin-top: 5px">
+                <div style="width: 100%; height: 658px; overflow: hidden; position: relative; z-index: 0; background-color: rgb(243, 241, 236); color: rgb(0, 0, 0); text-align: left;"
+                     id="container"></div>
+            </div>
+            <div class="col_right w270" style="margin-top: 5px">
+                <div class="map_right_con">
+                    <div class="scroll-pane" style="overflow: hidden; padding: 0px; width: 100%;">
+                        <div class="jspContainer" style="width: 300px; height: 620px;">
+                            <div class="jspPane" style="padding: 0px; top: 0px; width: 300px;">
+                                <volist name="schoolList" id="vo">
+                                    <a class="map_dl02" title="{$vo.display_name}" address="{$vo.address}" target="_blank"
+                                       href="{:U('school/schoolDetail',array('schoolId'=>$vo['id']),'')}"
+                                       telephone="{$vo.telephone}"
+                                       worktime="（9:30-18:00）" x="{$vo.position_x}" y="{$vo.position_y}">
+                                        <h5>{$vo.display_name}</h5>
+                                        <p>{$vo.address}</p>
+                                    </a>
+                                </volist>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="xq_page">
+                        {$page}
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                var map = new BMap.Map("container");
+
+                $(function () {
+                    $("#schoolInfo").addClass("selectmenu");
+
+                    map.centerAndZoom('{$cityName}', 12);
+
+                    map.enableScrollWheelZoom();    //启用滚轮放大缩小，默认禁用
+                    map.enableContinuousZoom();    //启用地图惯性拖拽，默认禁用
+
+                    map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+                    map.addControl(new BMap.OverviewMapControl()); //添加默认缩略地图控件
+
+                    var localSearch = new BMap.LocalSearch(map);
+                    localSearch.enableAutoViewport(); //允许自动调节窗体大小
+
+                    $(".map_dl02").hover(function () {
+                        $(this).css("background-color", "#F0F0F0");
+                        var x = $(this).attr('x');
+                        var y = $(this).attr('y');
+                        var name = $(this).attr('title');
+                        var address = $(this).attr('address');
+                        var telephone = $(this).attr('telephone');
+                        var point = new BMap.Point(x, y);
+                        var marker = new BMap.Marker(point);  // 创建标注
+                        map.addOverlay(marker);              // 将标注添加到地图中
+                        var opts = {
+                            width: 200,     // 信息窗口宽度
+                            height: 100,     // 信息窗口高度
+                            title: name, // 信息窗口标题
+                            enableMessage: false,//设置允许信息窗发送短息
+                        }
+                        var info = "地址：" + address + " <br> 电话：" + telephone;
+                        var infoWindow = new BMap.InfoWindow(info, opts);  // 创建信息窗口对象
+                        map.openInfoWindow(infoWindow, point); //开启信息窗口
+                    }, function () {
+                        $(this).css("background-color", "white");
+                    });
+                });
+
+                makerSchool();
+                function makerSchool() {
+                    var arr = <?php echo json_encode($schoolList) ?>;
+                for (var i=0;i
+                    <arr.length;i++) {
+                    var lng = arr[i]['position_x'];
+                    var lat = arr[i]['position_y'];
+
+                    createMark = function(lng, lat, info_html,schName) {
+                    var _marker = new BMap.Marker(new BMap.Point(lng, lat));
+                    var opts = {
+                    width: 200,     // 信息窗口宽度
+                    height: 100,     // 信息窗口高度
+                    title: name, // 信息窗口标题
+                    enableMessage: false,//设置允许信息窗发送短息
+                }
+                    _marker.addEventListener("click", function(e) {
+                    this.openInfoWindow(new BMap.InfoWindow(info_html,opts));
+                });
+                    _marker.addEventListener("mouseover", function(e) {
+                    this.setTitle(schName);
+                });
+                    return _marker;
+                };
+                    var sContent = arr[i]['org_name'] + '<br> 电话：' + arr[i]['telephone'] + '<br> 地址：' + arr[i]['address'];
+                    var marker = createMark(arr[i]['position_x'], arr[i]['position_y'], sContent,arr[i]['org_name']);
+                    map.addOverlay(marker);
+                }
+                }
+
+            </script>
+        </div>
+    </div>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>
+

@@ -1,0 +1,88 @@
+<style>
+    .top_menu {
+        font-family: "微软雅黑", "宋体", Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        color: #CCCCCC;
+    }
+
+    .top_menu .logo_img {
+        width: 100px;
+        height: 70px;
+    }
+
+    .top_menu ul li {
+        float: left;
+        line-height: 104px;
+        margin-left: 10px;
+        margin-right: 10px;
+        list-style-type: none;
+    }
+
+    .top_menu ul li a {
+        padding: 3px;
+    }
+
+    .search {
+        border: 1px solid #CCCCCC;
+        height: 30px;
+        width: 200px;
+        float: right;
+        margin-top: 35px;
+    }
+
+    .search .input {
+        border: none;
+        height: 27px;
+        width: 160px;
+        float: left;
+    }
+
+    .search .btn {
+        width: 38px;
+        border: none;
+        text-align: center;
+    }
+
+    .top_menu_active {
+        border-bottom: 4px solid red;
+    }
+
+    .top_menu ul li a:hover {
+        border-bottom: 4px solid red;
+    }
+
+    a:focus {
+        text-decoration: none;
+        border-top: 0px none;
+        border-right: 0px none;
+        border-left: 0px none;
+        outline: none;
+    }
+</style>
+<div style="width:100%;height:auto;min-height:104px;">
+    <div class="container top_menu">
+        <div class="row">
+            <div class="col-lg-1 col-md-1 fl" style="line-height:104px;">
+                <a href="__ROOT__/index.php/Home/Index/<?php echo $_SESSION['city'];?>">
+                    <img src="__PUBLIC__/images/logo.png" class="logo_img"/>
+                </a>
+            </div>
+            <div class="col-lg-2  col-md-2 fr" style="margin-top: 10px">
+                <div class="search">
+                    <input type="text" class="input" value="{$keywords}" placeholder="课程、老师、校区"/>
+                    <i class="fa fa-search btn" onclick="search()"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function search() {
+        var keywords = $('.search .input').val();
+        if (keywords == '') {
+            alert('请输入搜索关键字');
+            return;
+        }
+        location.href = "{:U('Search/search')}" + "?keywords=" + keywords;
+    }
+</script>

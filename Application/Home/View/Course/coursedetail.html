@@ -1,0 +1,143 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+<block name="top">
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+<block name="body">
+    <script type="text/javascript">
+        $(function () {
+            $("#searchCourse").addClass("select_menu");
+        });
+    </script>
+    <div class="container" style="height:450px;margin-top: 10px;" align="center">
+        <div style="height:450px;background-position:center center;background-repeat: no-repeat;background-size:100% auto;background-image: url('__PUBLIC__/img/course_02.jpg');"></div>
+    </div>
+
+    <div class="container" style="min-height:600px;">
+        <div class="row block">
+            <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 20px;">
+                <p><span style="font-size:40px;font-family:Arial;color:#02B389;">COURSE DETAILS</span></p>
+                <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">课程详情</span>
+                        &nbsp;———————
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div style="float:right; width:100%; margin-top:10px; text-align:right">
+            <if condition="session('onlineOrder')">
+                <a class="btn btn-danger" courseId="{$course.id}" id="msbm" onclick="showPaymentModal(this)">马上报名</a>
+            </if>
+        </div>
+        <div class="row" style="margin-bottom: 30px;">
+            <div class="col-lg-1" align="left">
+                <img src="__ROOT__{$course.path_picture}" width="285px" height="200px"/>
+            </div>
+            <div class="col-lg-6 col-md-offset-2" align="left">
+                <div class="jtlx2"
+                     style="font-size:22px;color:#333333;font-family:微软雅黑;margin-bottom: 10px;margin-left: 20px">
+                    {$course.display_name}
+                </div>
+                <div style="font-family: 微软雅黑;font-size: 14px;color:#999999;margin-left: 20px">
+                    <span style="font-family: 微软雅黑;font-size: 14px;color:#999999;">课程编码：{$course.course_no}</span>
+                    <br>课程简介：一学期{$course.course_count}课时
+                    <br>班级人数：{$course.people_count}人
+                    <br>上课时间：{$course.course_time_desc}
+                    <br>上课地点：{$course.course_place}
+                </div>
+                <div style="color:#999999;font-size:17px;line-height: 2.5em;margin-left: 20px">
+                    总价：<span style="font-size:17px; color:#FF1C1C; ">￥{$course.total_price}</span></div>
+            </div>
+        </div>
+
+        <div class="col-lg-12" align="center" style="margin-top: 20px;margin-bottom: 20px;">
+            <p><span style="font-size:40px;font-family:Arial;color:#02B389;">ALL TEACHERS</span></p>
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">授课老师</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+            <div class="row">
+                <volist name="teacherList" id="teacher">
+                    <div align="left" class="col-lg-3 col-md-3"
+                         style="margin-bottom: 15px;overflow:hidden;padding-top: 15px;">
+                        <div style="overflow: hidden;">
+                            <a href="{:U('teacher/showTeacherDetail#teacherInfo',array('teacherId'=>$teacher['id']),'')}"
+                               style="color:#ff0000;">
+                                <img src="__ROOT__/{$teacher.path_picture}" width="285px" height="200px"/>
+                            </a>
+                        </div>
+                        <div style="font-size:23px;padding-top: 10px">
+                            {$teacher.teacher_name}
+                        <span style="font-size:14px;margin-left: 5px">
+                            满意指数：
+                             </span>
+                            <for start="0" end="$teacher.evl_num">
+                                <img src="__PUBLIC__/images/star.png"/>
+                            </for>
+                        </div>
+                        <div style="font-size: 14px;padding-top: 10px;height: 150px">
+                            老师介绍：
+                            {$teacher.description} <a
+                                href="{:U('teacher/showTeacherDetail#teacherInfo',array('teacherId'=>$teacher['id']),'')}"
+                                style="color:#ff0000;">【详情】</a>
+                        </div>
+                    </div>
+                </volist>
+            </div>
+
+        <div class="row">
+            <div class="col-lg-12" align="center" style="margin-top: 20px;margin-bottom: 20px;">
+                <p><span style="font-size:40px;font-family:Arial;color:#02B389;">DETAILS</span></p>
+                <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">详细信息</span>
+                        &nbsp;———————
+                    </span>
+                </p>
+            </div>
+        </div>
+        <notempty name="course.desc_link">
+            <div style="width:100%;">
+                <div id="content" class="section-header">
+                </div>
+                <script type="application/javascript">
+                    var htmlobj = $.ajax({url: "__ROOT__{$course.desc_link}", async: false});
+                    $("#content").html(htmlobj.responseText);
+                </script>
+
+            </div>
+        </notempty>
+    </div>
+    </div>
+
+    <include file="common/area/payment"/>
+    <script type="text/javascript">
+        function showPaymentModal($this) {
+            var mobile = "<?PHP echo $_SESSION['mobile'] ?>";
+            var $href = "<?php echo U('course/onlineOrder');?>";
+            var prexUrl = $href.split(".html")[0];
+            $href = prexUrl + "/courseId/" + $($this).attr("courseId");
+            $("#payModal").attr("to_url", $href);
+            if (mobile == '') {
+                $("#payModal").modal("toggle");
+            } else {
+                location.href = $("#payModal").attr("to_url");
+            }
+        }
+    </script>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

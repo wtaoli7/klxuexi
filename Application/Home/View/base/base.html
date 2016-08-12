@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <include file="common/meta"/>
+    <include file="common/css"/>
+    <include file="common/js"/>
+    <block name="title"><title>快乐学习官网</title></block>
+</head>
+<body>
+<div class="header">
+    <block name="top"></block>
+</div>
+<block name="menu"></block>
+<block name="banner"></block>
+<block name="body">主内容</block>
+<block name="friendlinks">
+    <div class="container" style="padding-top: 20px">
+        <eq name="Think.session.cityCode" value="hefei">
+            <include file="common/hefei/friendlinks"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="xiamen">
+            <include file="common/xiamen/friendlinks"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="nanchang">
+            <include file="common/nanchang/friendlinks"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="quanzhou">
+            <include file="common/quanzhou/friendlinks"/>
+        </eq>
+        <eq name="Think.session.cityCode" value="fuzhou">
+            <include file="common/fuzhou/friendlinks"/>
+        </eq>
+    </div>
+</block>
+<block name="footer">底部</block>
+</body>
+</html>

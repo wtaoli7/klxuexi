@@ -1,0 +1,61 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+<block name="top">
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+<block name="body">
+    <script type="text/javascript">
+        $(function () {
+            $("#latestNews").addClass("select_menu");
+        });
+    </script>
+<div class="container">
+
+    <div style="float:left;  width:100%; margin-top:20px; margin-left:10px;font-size: 12px">
+
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" style="line-height:26px;">
+            <tr>
+                <td style="font-size:26px; font-weight:bold;">{$detail.title}</td>
+            </tr>
+            <tr>
+                <td style="border-bottom:1px dashed #ccc; padding-top:10px;">
+                    <div style="float:right; color:#aaa;">访问量：{$detail.hits}</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="background:#eee; margin-top:10px; padding-left:10px; line-height:30px; font-size:14px; font-weight:bold;">
+                        摘要：{$detail.summary}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <!--<iframe src="__ROOT__{$detail.link_address}" width="100%" height="550px"-->
+                            <!--frameborder="0"></iframe>-->
+                    <div id="content" class="section-header" style="padding-top: 50px;font-size: 15px">
+
+                    </div>
+                    <script type="application/javascript">
+                        var htmlobj = $.ajax({url:"__ROOT__{$detail.link_address}",async:false});
+                        $("#content").html(htmlobj.responseText);
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+<div class="section-header" style="padding-bottom: 75px;"></div>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

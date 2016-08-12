@@ -1,0 +1,129 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+<block name="top">
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+
+<block name="body">
+    <script type="text/javascript">
+        $(function () {
+            $("#starTeacher").addClass("select_menu");
+        });
+    </script>
+    <div class="container" style="height:450px;margin-top: 10px;" align="center">
+        <div style="height:450px;background-repeat: no-repeat;background-size:100% auto;background-image: url('__PUBLIC__/img/teacher_01.jpg');">
+
+        </div>
+    </div>
+    <div class="container" id="teacherInfo">
+        <div class="row block">
+            <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 30px;">
+                <p><span style="font-size:40px;font-family:Arial;color:#02B389;">STAR TEACHER</span></p>
+                <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">星级名师</span>
+                        &nbsp;———————
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-lg-1" align="left">
+                    <img src="__ROOT__{$teacher.path_picture}" height="200px" width="285px"/>
+                </div>
+                <div class="col-lg-6 col-md-offset-2" style="margin-bottom: 15px;" align="left">
+                    <div style="width: 100%;margin-left: 20px">
+                        <div style="width: 100%;" align="left">
+                            <div style="width: 60%;">
+                             <span style="font-size:25px;color:#333333;font-family:微软雅黑;margin-bottom: 10px;">{$teacher.teacher_name}
+                             <span style="font-family: '微软雅黑';font-size: 14px;">
+                             满意指数：
+                                <for start="0" end="$teacher.evl_num">
+                                    <img src="__PUBLIC__/images/star.png"/>
+                                </for>
+                              </span>
+                            </div>
+                        </div>
+                        <div style="width: 100%;border-bottom: 1px solid #e1e2e1;margin-top: 10px" align="left">
+                        </div>
+            <span style="font-family: '微软雅黑';font-size: 14px;color:#999999;">
+                <br>授课科目：{$teacher.subject_name}
+                <br>授课年段：{$teacher.grade_name}
+                <br>教师介绍：{$teacher.idea}
+            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row block">
+            <div class="col-lg-12" align="center" style="margin-top: 30px;margin-bottom: 30px;">
+                <p><span style="font-size:40px;font-family:Arial;color:#02B389;">TEACHER COURSE</span></p>
+                <p>
+                    <span style="font-family:'微软雅黑';color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:'微软雅黑';font-size:18px;color:#333333;">授课班级</span>
+                        &nbsp;———————
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <volist name="courseList" id="course">
+                <div class="col-lg-12" style="margin-bottom:30px;">
+                    <div class="col-lg-3" style="overflow: hidden;">
+                        <a href="{:U('course/showCourseDetail',array('courseId'=>$course['id']))}">
+                            <img src="__ROOT__/{$course.path_picture}" height="200px" width="285px"/>
+                        </a>
+                    </div>
+                    <div class="col-lg-8" style="margin-left: 10px">
+                        <div style="font-size:25px;color:#333333;font-family:'微软雅黑';margin-bottom: 10px;">
+                            {$course.display_name}
+                        </div>
+                        <div style="font-family: '微软雅黑';font-size: 14px;color: #999999">
+                            <br>课程编号：{$course.course_no}
+                            <br>班级人数：{$course.people_count}
+                            <br>开课时间：{$course.start_date}
+                        </div>
+                        <div style="font-family: '微软雅黑';font-size: 14px;color: #999999">
+                            课程价格：<span style="font-size:17px; color:#FF1C1C; ">￥{$course['unit_price']*$course['course_count']}</span>
+                        </div>
+                        <div>
+                            <if condition="session('onlineOrder')">
+                                <a courseId="{$course.id}" id="msbm" onclick="showPaymentModal(this)"
+                                   class="btn btn-danger">马上报名</a>
+                            </if>
+                        </div>
+                    </div>
+                </div>
+            </volist>
+
+        </div>
+    </div>
+    </div>
+
+    <script type="text/javascript">
+        function showPaymentModal($this) {
+            var mobile = "<?PHP echo $_SESSION['mobile'] ?>";
+            var $href = "<?php echo U('course/onlineOrder');?>";
+            var prexUrl = $href.split(".html")[0];
+            $href = prexUrl + "/courseId/" + $($this).attr("courseId");
+            $("#payModal").attr("to_url", $href);
+            if (mobile == '') {
+                $("#payModal").modal("toggle");
+            } else {
+                location.href = $("#payModal").attr("to_url");
+            }
+        }
+    </script>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

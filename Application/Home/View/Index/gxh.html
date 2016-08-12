@@ -1,0 +1,988 @@
+<extend name="./base/base"/>
+<block name="title"><title>{$title}</title></block>
+
+<block name="top">
+    <script src="__PUBLIC__/js/bootstrap/bootstrap-multiselect.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/js/bootstrap/bootstrap-select.min.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/js/bootstrap/i18n/defaults-zh_CN.js" type="text/javascript"></script>
+    <import typ="js" file="js.cookie.cookie"/>
+    <link rel="stylesheet" href="__PUBLIC__/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" href="__PUBLIC__/css/bootstrap-select.min.css">
+    <include file="common/head"/>
+</block>
+<block name="menu">
+    <include file="common/topmenu"/>
+</block>
+
+<block name="body">
+    <style>
+        /* Custom Styles */
+        ul.nav-tabs {
+            width: 140px;
+            margin-top: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+        }
+
+        ul.nav-tabs li {
+            margin: 0;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+
+        ul.nav-tabs li:first-child {
+            border-top: none;
+        }
+
+        ul.nav-tabs li a {
+            margin: 0;
+            padding: 8px 16px;
+            border-radius: 0;
+            /*color: black;*/
+        }
+
+        ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
+            color: #FF0000;
+            background: #d0d0d0;
+            border: 1px solid #d0d0d0;
+        }
+
+        ul.nav-tabs li:first-child a {
+            border-radius: 4px 4px 0 0;
+        }
+
+        ul.nav-tabs li:last-child a {
+            border-radius: 0 0 4px 4px;
+        }
+
+        ul.nav-tabs.affix {
+            top: 30px; /* Set the top position of pinned element */
+            margin-bottom: 100px;
+        }
+
+        .footer_tool {
+            width: 200px;
+            height: 150px;
+            position: fixed;
+            bottom: 300px;
+            right: 50px;
+        }
+
+    </style>
+    <script type="text/javascript">
+        var URL = '__URL__';
+        function verifyEmpty(id, msg) {
+
+            if ($("#" + id).val() == '' || null == $("#" + id).val()) {
+                $("#validator_span").text(msg);
+                $("#validator_msg").show();
+                $("#" + id).focus();
+                return false;
+            }
+            return true;
+        }
+
+        function whenAccipted(msg) {
+            if (msg['msg'] == 'OK') {
+                if ($("#myAlert").hasClass("alert-warning"))
+                    $("#myAlert").removeClass("alert-warning").addClass("alert-success");
+                $("#validator_msg").show();
+                $("#validator_span").text("发送成功!");
+            }
+            else {
+                $("#validator_span").text(msg['detail']);
+                $("#validator_msg").show();
+                $("#verify_code").focus();
+                $("#btn_code").attr("disabled", false);
+                deleteTask();
+                check = false;
+                return false;
+            }
+        }
+
+        function whenAfterSaved() {
+            $("#myAlert").removeClass("alert-warning").addClass("alert-success");
+            $("#validator_span").text("恭喜您!预约成功");
+            $("#validator_msg").show();
+            $("#appoint_form")[0].reset();
+            deleteTask();
+            $("#subject_select").multiselect("clearSelection");//清除科目下拉列表
+            $("#grade_select").multiselect("clearSelection");//清除年级下拉列表
+            $("#commit_btn").attr("disable", false);
+        }
+        function changeStyle() {
+            if ($("#myAlert").hasClass("alert-warning") == false)
+                $("#myAlert").removeClass("alert-success").addClass("alert-warning");
+        }
+        function checkCode() {
+            var $URL = "{:U('index/checkCode')}";
+            $.ajax({
+                async: false, type: "POST", url: $URL,
+                data: {tel: $("#tel_number").val(), code: $("#verify_code").val()},
+                dataType: 'json',
+                success: function (data) {
+                    if (data['status'] == 0) {
+                        changeStyle();
+                        $("#validator_span").text("验证码输入错误,请重新输入");
+                        $("#validator_msg").show();
+                        $("#verify_code").focus();
+                        return false;
+                    }
+                    else if (data['status'] == 1) {
+                        save();
+                    }
+                }
+            });
+            return true;
+        }
+
+        function cancelAppointModal() {
+            $("#appointModal").modal("hide");
+        }
+
+        function verifyTel() {
+            if ($("#tel_number").val() == '' || !$("#tel_number").val().match(/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/)) {
+                $("#validator_span").text("手机号码不合法,请重新输入");
+                $("#validator_msg").show();
+                $("#tel_number").focus();
+                return false;
+            }
+            return true;
+        }
+        var check = true;
+        function validator() {
+            changeStyle();
+            check = verifyEmpty('tel_number', "手机号码不能为空!");
+            if (check == false) return false;
+            check = verifyEmpty('verify_code', "请输入您到验证码!");
+            if (check == false) return false;
+            check = verifyEmpty('call_name', "您的称呼不能为空!");
+            if (check == false) return false;
+            check = verifyEmpty('subject_select', "请选择您想预约的科目");
+            if (check == false) return false;
+            check = verifyEmpty('grade_select', "请选择您想预约的年级!");
+            if (check == false) return false;
+            check = verifyTel();
+            if (check == false) return false;
+            return check;
+        }
+        function save() {
+            var $data = $("#appoint_form").serializeArray();
+            $data = getCombinePostDatas($data);
+            if (validator() == false)
+                return;
+            $("#commit_btn").attr("disable", true);
+            $("#validator_msg").hide();
+            $.ajax({
+                type: "post", url: URL + '/saveAppointMent', data: $data, dataType: "JSON",
+                success: function (msg) {
+                    if (msg['status'] == 1) {
+                        whenAfterSaved();
+                    }
+                }
+            });
+        }
+
+        //清除定时器
+        function deleteTask() {
+            $("#btn_code").attr("disabled", false);
+            $("#btn_code").html("获取验证码");
+            clearTimeout(timeout);//停止定时器
+        }
+
+        //接受验证码
+        function accipteVerifyCode() {
+            if (verifyTel() == false)
+                return false;
+            $.ajax({
+                type: "post",
+                url: URL + '/sendVerifyCode',
+                data: {mobie: $("#tel_number").val()},
+                dataType: "JSON",
+                aysnc: false,
+                cache: false,
+                success: function (msg) {
+                    whenAccipted(msg);
+                }
+            });
+            return true;
+        }
+
+        var countdown = 60;
+        var timeout;
+        function resendLeftTime() {
+            var $obj = $("#btn_code");
+            if (countdown == 0) {
+                $obj.attr("disabled", false);
+                $("#btn_code").html("获取验证码");
+                countdown = 60;
+                return;
+            } else {
+                $("#btn_code").html(countdown + "秒后" + "");
+                $obj.attr("disabled", true);
+                countdown--;
+            }
+            timeout = setTimeout(function () {
+                resendLeftTime()
+            }, 1000)
+        }
+
+        $(function () {
+            $("#gxh").addClass("select_menu");
+            var screen_height = document.documentElement.clientHeight;
+            $("input[type='text']").each(function () {
+                $(this).bind("change mouseover click mouseenter", function () {
+                    $(this).val($(this).val().replace(/[~'!<>@#$%^`&*()-+_=:]/g, ""));
+                })
+            });
+
+            $("#btn_code").bind("click", function () {
+                var bool = accipteVerifyCode();
+                if (bool)
+                    resendLeftTime();
+            });
+
+            $(window).scroll(function () {
+                if ($(document).scrollTop() > screen_height) {
+                    $(".footer_tool a#back").fadeIn();
+                    $("#myScrollspy").fadeIn();
+                } else {
+                    $(".footer_tool a#back").fadeOut();
+                    $("#myScrollspy").fadeOut();
+                }
+            });
+
+            $(".footer_tool").on("click", "a#back", function () {
+                $("html,body").animate({scrollTop: 0}, 1000);
+            });
+
+            $(".footer_tool").on("click", "a#tel", function () {
+                $("#appointModal").modal("show");
+            });
+
+        })
+
+        function getCombinePostDatas($data) {
+            var subjects = [], grades = [];
+            for (var v in $data) {
+                var $json = $data[v];
+                if ("subjectOption" == $json['name']) {
+                    subjects.push($json['value'])
+                }
+            }
+            var $s = $.parseJSON("{}");
+            $s['name'] = 'subjectName';
+            var subjects = subjects.join(',');
+            $s['value'] = subjects;
+            var $b = $.parseJSON("{}");
+            $b['name'] = 'branchId';
+            $b['value'] = $("#schoolSelect").val();
+            $data.push($s);
+            $data.push($b);
+            return $data;
+        }
+    </script>
+    </head>
+    <body data-spy="scroll" data-target="#myScrollspy">
+    <div class="row block" >
+        <div class="col-lg-12" align="center" style="margin-top: 50px;margin-bottom: 50px;">
+            <p><span style="font-size:40px;font-family:Arial;color:#02B389;">1 TO 1 COUNSELING</span></p>
+            <p>
+                    <span style="font-family:微软雅黑;color:#E2E3E5;">
+                        ——————— &nbsp;
+                        <span style="font-family:微软雅黑;font-size:18px;color:#333333;">1对1辅导</span>
+                        &nbsp;———————
+                    </span>
+            </p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="footer_tool" id="myScrollspy" style="display: none;z-index:10001;">
+            <ul class="nav nav-tabs nav-stacked" data-spy="affix"  style="height: 290px">
+                <li><a class="icon-chevron-up"  href="javascript:;" id="back">置顶</a></li>
+                <li><a href="#section-1">课程体系</a></li>
+                <li><a href="#section-2">课程特色</a></li>
+                <li><a href="#section-3">课程内容</a></li>
+                <li><a href="#section-4">教学模式</a></li>
+                <li><a href="#section-5">教学理念</a></li>
+                <li><a href="#section-6">辅导流程</a></li>
+                <li><a class="icon-phone" href="javascript:;" id="tel">马上预约</a></li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="section-1">
+                    <div style="height:auto;margin-bottom: 40px;">
+                        <div class="row" align="center" style="margin-bottom: 40px;">
+                            <div class="div_allinline">
+                                <div class="subdiv_allinline" style="font-size: 32px;font-weight: bold;">课程体系</div>
+                            </div>
+                            <div class="div_allinline" style="margin-top: 5px;">
+                                <div class="subdiv_allinline" style="font-size: 16px;">丰富的课程体系 解决不同对象的授课需求</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div style="width:100%;height:510px;overflow-x: hidden;background-image: url(__PUBLIC__/images/gxh/1/gxh-1-1.png);background-repeat: no-repeat;background-position: center;margin-bottom: 30px;">
+                                    <div style="position: relative;top: 440px;  width:100%;color: #fff;">
+                                        <div align="center">
+                                            <div class="subdiv_allinline" style="font-size: 24px;font-weight: bold;">
+                                                1对1课程
+                                            </div>
+                                        </div>
+                                        <div align="center" style="margin-top: 5px;">
+                                            <div class="subdiv_allinline" style="font-size: 14px;">1对1面授、星级服务、全程跟踪</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div style="width:100%;height:240px;margin-bottom:30px;overflow: hidden;background-image: url(__PUBLIC__/images/gxh/1/gxh-1-2.png);background-repeat: no-repeat;background-position: center;margin-bottom: 30px;">
+                                    <div style="position: relative;top: 170px;  width:100%;color: #fff;">
+                                        <div align="center">
+                                            <div class="subdiv_allinline" style="font-size: 24px;font-weight: bold;">
+                                                MINI课程
+                                            </div>
+                                        </div>
+                                        <div align="center" style="margin-top: 5px;">
+                                            <div class="subdiv_allinline" style="font-size: 14px;">能力提升、小组授课、潜力激发</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="width:100%;height:240px;overflow: hidden;background-image: url(__PUBLIC__/images/gxh/1/gxh-1-3.png);background-repeat: no-repeat;background-position: center;margin-bottom: 30px;">
+                                    <div style="position: relative;top: 170px;  width:100%;color: #fff;">
+                                        <div align="center">
+                                            <div class="subdiv_allinline" style="font-size: 24px;font-weight: bold;">
+                                                VIP晚自习
+                                            </div>
+                                        </div>
+                                        <div align="center" style="margin-top: 5px;">
+                                            <div class="subdiv_allinline" style="font-size: 14px;">全程陪读、兴趣激发、现场答疑</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div style="width:100%;height:240px;margin-bottom:30px;overflow: hidden;background-image: url(__PUBLIC__/images/gxh/1/gxh-1-4.png);background-repeat: no-repeat;background-position: center;">
+                                    <div style="position: relative;top: 170px; width:100%;color: #fff;">
+                                        <div align="center">
+                                            <div class="subdiv_allinline" style="font-size: 24px;font-weight: bold;">
+                                                MVP课程
+                                            </div>
+                                        </div>
+                                        <div align="center" style="margin-top: 5px;">
+                                            <div class="subdiv_allinline" style="font-size: 14px;">高端环境、顶尖名师、高效课程</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="width:100%;height:240px;overflow: hidden;background-image: url(__PUBLIC__/images/gxh/1/gxh-1-5.png);background-repeat: no-repeat;background-position: center;">
+                                    <div style="position: relative;top: 170px; width:100%;color: #fff;">
+                                        <div align="center">
+                                            <div class="subdiv_allinline" style="font-size: 24px;font-weight: bold;">
+                                                中高考全日制课程
+                                            </div>
+                                        </div>
+                                        <div align="center" style="margin-top: 5px;">
+                                            <div class="subdiv_allinline" style="font-size: 14px;">量身定做、卓越同行、状元摇篮</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section-2" style="width:100%;background-color: #f9f9f9;">
+                    <div style="height:auto;margin-bottom: 40px;">
+                        <div class="row" align="center" style="margin-bottom: 40px;">
+                            <div class="div_allinline">
+                                <div class="subdiv_allinline" style="font-size: 32px;font-weight: bold;">课程特色</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: 4px solid #ff0000;border-radius: 50%;margin:0 auto;width:140px;height:140px;text-align: center;">
+                                        <i class="fa fa-book"
+                                           style="font-size: 36px;line-height: 140px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 24px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    1对1课程
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    根据学生特点为其选择合适的老师，制定个性化学习计划，习惯养成计划和心理辅导计划。
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: 4px solid #ff0000;border-radius: 50%;margin:0 auto;width:140px;height:140px;text-align: center;">
+                                        <i class="fa fa-users"
+                                           style="font-size: 36px;line-height: 140px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 24px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    多对一管理
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    专属学管师全面管理学员，学业动态；专属心理咨询师全程帮助学员保持良好学习心态；教学总监全面监督教学质量。
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: 4px solid #ff0000;border-radius: 50%;margin:0 auto;width:140px;height:140px;text-align: center;">
+                                        <i class="fa fa-mortar-board"
+                                           style="font-size: 36px;line-height: 140px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 24px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    一流名师
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    专业教研专家把脉中、高考动向，资深教育专家精研教学方法，各具特色的一线教师异彩纷呈，屡创厦门中高考教育神话。
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: 4px solid #ff0000;border-radius: 50%;margin:0 auto;width:140px;height:140px;text-align: center;">
+                                        <i class="fa fa-star"
+                                           style="font-size: 36px;line-height: 140px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 24px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    星级服务
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    高雅舒适的学习环境，个性化的课程设置，专属的学习管理团队，让孩子真正享受超五星级的教育服务。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section-3"
+                     style="width:100%;background-image: url(__PUBLIC__/images/gxh/3/gxh-3-1.png);color: #fff;">
+                    <div style="height:auto;margin-bottom: 80px;">
+                        <div class="row" align="center" style="margin-bottom: 40px;">
+                            <div class="div_allinline">
+                                <div class="subdiv_allinline" style="font-size: 32px;font-weight: bold;">课程内容</div>
+                            </div>
+                            <!--<div class="div_allinline" style="margin-top: 5px;">
+                                <div class="subdiv_allinline" style="font-size: 16px;">丰富的课程体系 解决不同对象的授课需求</div>
+                            </div>-->
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: none;background-color:#fff;border-radius: 50%;margin:0 auto;width:80px;height:80px;text-align: center;">
+                                        <i class="fa fa-pencil-square-o"
+                                           style="font-size: 24px;line-height: 80px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    因材施教，制定个性化辅导方案
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;text-align: center;color: #cccccc;">
+                                    与其他教学模式不同，在快乐学习个性化辅导中，老师会在教研团队的鼎力支持下将"因材施教"演绎到极致。适时的鼓励和引导，灵活的教学节奏，联系生活的讲解......令人欣喜的改变就在这些细节中悄悄发生着。
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: none;background-color:#fff;border-radius: 50%;margin:0 auto;width:80px;height:80px;text-align: center;">
+                                        <i class="fa fa-search"
+                                           style="font-size: 24px;line-height: 80px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    有针对性地查漏补缺
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;text-align: center;color: #cccccc;">
+                                    在提高孩子考试成绩的过程中，如何真正将他们过往知识体系中缺失或不扎实的部分强化起来是快乐学习老师十分关注的环节，在教学中，我们不遗漏任何一个知识点，并注重知识点之间的相互联系，让孩子能够融汇贯通。
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div style="width:100%;text-align: center;" align="center;">
+                                    <div style="border: none;background-color:#fff;border-radius: 50%;margin:0 auto;width:80px;height:80px;text-align: center;">
+                                        <i class="fa fa-search"
+                                           style="font-size: 24px;line-height: 80px;color: #ff0000;"></i>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 20px;margin-bottom: 20px;">
+                                    培养正确的学习习惯和学习方法
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;text-align: center;color: #cccccc;">
+                                    古人云：授之以"鱼"不如授之以"渔"。好的方法能够对孩子一生的学习、工作和生活产生重大影响。在培养兴趣的基础上，我们尤其注重对孩子进行良好学习方法和学习习惯的“训练”。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-4" style="width:100%;">
+                    <div style="height:auto;margin-bottom: 40px;background:#f9f9f9;">
+                        <div class="row" align="center" style="margin-bottom: 40px;">
+                            <div class="div_allinline">
+                                <div class="subdiv_allinline" style="font-size: 32px;font-weight: bold;">教学模式</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6" style="margin-bottom: 50px;">
+                                <a class="pull-left"
+                                   style="color: #ff0000;font-size: 60px;margin-right: 20px;line-height: 100px;cursor: default">
+                                    <i class="fa fa-user"></i>
+                                </a>
+                                <div class="media-body">
+                                    <p style="font-weight: bold;font-size: 20px;line-height: 40px;">专业教学顾问制定个性辅导方案</p>
+                                    <p>内容：学科知识评估；性格特质分析；接受能力测评；学习问题诊断</p>
+                                    <p>特色：根据测试结果进行科学分析，为学生量身定制个性化辅导方案</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6" style="margin-bottom: 50px;">
+                                <a class="pull-left"
+                                   style="color: #ff0000;font-size: 60px;margin-right: 20px;line-height: 100px;cursor: default">
+                                    <i class="fa fa-book"></i>
+                                </a>
+                                <div class="media-body">
+                                    <p style="font-weight: bold;font-size: 20px;line-height: 40px;">
+                                        课余辅导师耐心陪读“360度综合答疑”</p>
+
+                                    <p>内容：纠正学习误区， 巩固学习要点，扫除知识盲点</p>
+                                    <p>特色：零盲点，低压力，高效率，培养良好学习习惯，帮助孩子快乐高效学习。</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6" style="margin-bottom: 50px;">
+                                <a class="pull-left"
+                                   style="color: #ff0000;font-size: 50px;margin-right: 5px;line-height: 100px;cursor: default">
+                                    3C
+                                </a>
+                                <div class="media-body">
+                                    <p style="font-weight: bold;font-size: 20px;line-height: 40px;">资深考试专家设计“3C冲刺法”</p>
+                                    <p>内容：点睛备考方向，热门考点分析，今年考题预测，提高备考效率</p>
+                                    <p>特色：研究考试政策，结合教学大纲，配合授课老师设计特色教学方案</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6" style="margin-bottom: 50px;">
+                                <a class="pull-left"
+                                   style="color: #ff0000;font-size: 56px;margin-right: 20px;line-height: 100px;cursor: default">
+                                    <i class="fa fa-send-o"></i>
+                                </a>
+                                <div class="media-body">
+                                    <p style="font-weight: bold;font-size: 20px;line-height: 40px;">学习管理师全程监控构建
+                                        “亲子互动”桥梁</p>
+                                    <p>内容：跟踪学习情况；反馈学习效果；定期学习效果评估；调整培养教学计划 </p>
+                                    <p>特色：无缝管理体系，分层次针对性提升，分阶段重点教学，保障学习效果</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6" style="margin-bottom: 50px;">
+                                <a class="pull-left"
+                                   style="color: #ff0000;font-size: 50px;margin-right: 5px;line-height: 100px;cursor: default">
+                                    3S
+                                </a>
+                                <div class="media-body">
+                                    <p style="font-weight: bold;font-size: 20px;line-height: 40px;">优秀学科名师
+                                        推行“3S快乐学习法”</p>
+                                    <p>内容：兴趣培养，潜力激发，知识梳理，方法优化，技能提升 </p>
+                                    <p>特色：根据孩子特点实行因材施教，灵活多样的教学方式，增添学生学习趣味</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6" style="margin-bottom: 50px;">
+                                <a class="pull-left"
+                                   style="color: #ff0000;font-size: 56px;margin-right: 20px;line-height: 100px;cursor: default">
+                                    <i class="fa fa-heart-o"></i>
+                                </a>
+                                <div class="media-body">
+                                    <p style="font-weight: bold;font-size: 20px;line-height: 40px;">
+                                        心理辅导专家实现“心贴心”亲密沟通</p>
+                                    <p>内容：舒缓压力；解决沟通障碍，治疗青春焦虑；消除自卑</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section-5" style="width:100%;background-color: #f9f9f9;">
+                    <div style="height:auto;margin-bottom: 40px;">
+                        <div class="row" align="center" style="margin-bottom: 40px;">
+                            <div class="div_allinline">
+                                <div class="subdiv_allinline" style="font-size: 32px;font-weight: bold;">教学理念</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <div style="width:100%;text-align: center;overflow: hidden;" align="center;">
+                                    <div style="width:100%;height:200px;background-image: url(__PUBLIC__/images/gxh/5/gxh-5-1.png);background-repeat: no-repeat;"></div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 10px;margin-bottom: 7px;">
+                                    第一步
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    增强学习动力，消除畏难心理，明确学习目标；
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div style="width:100%;text-align: center;overflow: hidden;" align="center;">
+                                    <div style="width:100%;height:200px;background-image: url(__PUBLIC__/images/gxh/5/gxh-5-2.png);background-repeat: no-repeat;"></div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 10px;margin-bottom: 7px;">
+                                    第二步
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    趣味教学培养学习兴趣，扬长避短激发学生潜力；
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div style="width:100%;text-align: center;overflow: hidden;" align="center;">
+                                    <div style="width:100%;height:200px;background-image: url(__PUBLIC__/images/gxh/5/gxh-5-3.png);background-repeat: no-repeat;"></div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 10px;margin-bottom: 7px;">
+                                    第三步
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    开拓解题思维，纠察学习弊端，优化学习方法；
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div style="width:100%;text-align: center;overflow: hidden;" align="center;">
+                                    <div style="width:100%;height:200px;background-image: url(__PUBLIC__/images/gxh/5/gxh-5-4.png);background-repeat: no-repeat;"></div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 10px;margin-bottom: 7px;">
+                                    第四步
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    务实基础，打破思维定式，完善知识体系，学习问题清零；
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div style="width:100%;text-align: center;overflow: hidden;" align="center;">
+                                    <div style="width:100%;height:200px;background-image: url(__PUBLIC__/images/gxh/5/gxh-5-5.png);background-repeat: no-repeat;"></div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 10px;margin-bottom: 7px;">
+                                    第五步
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    高效学习锦囊，排除学习干扰，提高解题速度，提升学习效率；
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <div style="width:100%;text-align: center;overflow: hidden;" align="center;">
+                                    <div style="width:100%;height:200px;background-image: url(__PUBLIC__/images/gxh/5/gxh-5-6.png);background-repeat: no-repeat;"></div>
+                                </div>
+
+                                <div style="text-align: center;width: 100%;font-size: 18px;font-weight: bold;margin-top: 10px;margin-bottom: 7px;">
+                                    第六步
+                                </div>
+
+                                <div style="width: 100%;font-size: 14px;font-weight: light;line-height:25px;">
+                                    精打细算，细致规划，有效利用学习时间，良好学习习惯的养成。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-6" style="width:100%;">
+                    <div style="height:auto;margin-bottom: 40px;background:#f9f9f9;">
+                        <div class="row" align="center" style="margin-bottom: 40px;">
+                            <div class="div_allinline">
+                                <div class="subdiv_allinline" style="font-size: 32px;font-weight: bold;">辅导流程</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="margin-bottom: 50px;">
+                                <div style="width: 100%;border: 1px solid #CCCCCC;height:60px;line-height:60px;text-align: center;color: red;font-size: 20px;">
+                                    个性化专业测评
+                                </div>
+                                <div style="margin-bottom: 50px;margin-top: 50px;height: 50px;line-height: 50px;font-size: 48px;text-align: center;color: #CCCCCC;">
+                                    <i class="fa fa-long-arrow-up"></i>
+                                </div>
+                                <div style="width: 100%;border: 1px solid #CCCCCC;height:60px;line-height:60px;text-align: center;color: red;font-size: 20px;">
+                                    六对一全程跟踪
+                                </div>
+                            </div>
+
+                            <div class="col-lg-1 col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-bottom: 50px;">
+                                <div style="width: 100%;height:60px;line-height:60px;text-align: center;font-size: 48px;color: #CCCCCC;">
+                                    <i class="fa fa-long-arrow-right"></i>
+                                </div>
+                                <div style="margin-bottom: 50px;margin-top: 50px;height: 50px;line-height: 50px;font-size: 48px;text-align: center;color: #CCCCCC;">
+
+                                </div>
+                                <div style="width: 100%;height:60px;line-height:60px;text-align: center;font-size: 48px;color: #CCCCCC;">
+                                    <i class="fa fa-long-arrow-left"></i>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-lg-3 col-md-3 col-sm-3 col-xs-3" style="margin-bottom: 50px;">
+                                <div style="width: 100%;border: 1px solid #CCCCCC;height:60px;line-height:60px;text-align: center;color: red;font-size: 20px;">
+                                    定制个性化学习方案
+                                </div>
+                                <div style="margin-bottom: 50px;margin-top: 50px;height: 50px;line-height: 50px;font-size: 48px;text-align: center;color: #CCCCCC;">
+
+                                </div>
+                                <div style="width: 100%;border: 1px solid #CCCCCC;height:60px;line-height:60px;text-align: center;color: red;font-size: 20px;">
+                                    名师1对1面授
+                                </div>
+                            </div>
+
+                            <div class="col-lg-1 col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-bottom: 50px;">
+                                <div style="width: 100%;height:60px;line-height:60px;text-align: center;font-size: 48px;color: #CCCCCC;">
+                                    <i class="fa fa-long-arrow-right"></i>
+                                </div>
+                                <div style="margin-bottom: 50px;margin-top: 50px;height: 50px;line-height: 50px;font-size: 48px;text-align: center;color: #CCCCCC;">
+
+                                </div>
+                                <div style="width: 100%;height:60px;line-height:60px;text-align: center;font-size: 48px;color: #CCCCCC;">
+                                    <i class="fa fa-long-arrow-left"></i>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-lg-3 col-md-3 col-sm-3 col-xs-3" style="margin-bottom: 50px;">
+                                <div style="width: 100%;border: 1px solid #CCCCCC;height:60px;line-height:60px;text-align: center;color: red;font-size: 20px;">
+                                    匹配老师，定制课程
+                                </div>
+                                <div style="margin-bottom: 50px;margin-top: 50px;height: 50px;line-height: 50px;font-size: 48px;text-align: center;color: #CCCCCC;">
+                                    <i class="fa fa-long-arrow-down"></i>
+                                </div>
+                                <div style="width: 100%;border: 1px solid #CCCCCC;height:60px;line-height:60px;text-align: center;color: red;font-size: 20px;">
+                                    确定个性化辅导计划
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="appointModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true" style="z-index: 10001;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="appointModalLabel">
+                        预约咨询
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" align="center">
+                        <form class="form-horizontal" role="form" id="appoint_form" method="post"
+                              style="width:500px;text-align: left;">
+                            <div class="form-group" id="validator_msg" style="display: none">
+                                <div id="myAlert" class="alert alert-warning">
+                                    <a href="javascript:void(0)" class="close"
+                                       onclick="javascript:$('#validator_msg').hide();">&times;</a>
+                                    <strong id="validator_span"></strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div>手机号<span style="color: #ff0000">*</span>:</div>
+                                <input class="form-control" placeholder="请输入手机号" required="required" check-type="mobiel"
+                                       name="telNumber" id="tel_number"/>
+
+                            </div>
+                            <div class="form-group">
+                                <div>校验码<span style="color: #ff0000">*</span>:</div>
+                                <div class="input-group">
+                                    <input class="form-control" required="required" placeholder="请输入验证码"
+                                           required="required" type="text" id="verify_code">
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-default" id="btn_code" type="button">获取验证码</button>
+                                      </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div>称 呼<span style="color: #ff0000">*</span>:</div>
+                                <input class="form-control" placeholder="父亲" name="callName" required="required"
+                                       id="call_name" type="text">
+                            </div>
+                            <div class="form-group">
+                                <div>科 目<span style="color: #ff0000">*</span>:</div>
+                                <div class="control-group">
+                                    <select class="form-control" id="subject_select" name="subjectOption"
+                                            multiple="multiple">
+                                        <foreach name="gxhSubjectList" item="grade" key="k">
+                                            <option value="{$grade.display_name}" name="subjectName">
+                                                {$grade.display_name}
+                                            </option>
+                                        </foreach>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div>年 级<span style="color: #ff0000">*</span>:</div>
+                                <div class="control-group">
+                                    <select class="form-control" id="grade_select" name="gradeLevel">
+                                        <foreach name="gxhGradeList" item="grade" key="k">
+                                            <option value="{$grade.display_name}">{$grade.display_name}</option>
+                                        </foreach>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div>备 注:</div>
+                                <input class="form-control" placeholder="备注" name="remark" id="remark" type="text">
+                            </div>
+
+                            <div class="form-group" align="center">
+                                <button type="button" onclick="checkCode();" id="commit_btn"
+                                        class="btn btn-sm btn-primary">
+                                    提交
+                                </button>
+
+                                <button type="button" onclick="cancelAppointModal();" id="cancel_btn"
+                                        class="btn btn-sm btn-primary" style="margin-left: 30px">
+                                    取消
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    </body>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#grade_select').multiselect(
+                    {
+                        enableFiltering: true,
+                        buttonWidth: '100%',
+                        includeSelectAllOption: true,
+                        nonSelectedText: '请选择年级',
+                        selectAllText: '选择所有',
+                        numberDisplayed: 5,
+                        disableIfEmpty: true,
+                        allSelectedText: '年级选择数',
+                        filterPlaceholder: '搜索年级'
+
+                    }
+            );
+
+            $('#subject_select').multiselect(
+                    {
+                        enableFiltering: true,
+                        buttonWidth: '100%',
+                        includeSelectAllOption: true,
+                        nonSelectedText: '请选科目',
+                        selectAllText: '选择所有',
+                        numberDisplayed: 15,
+                        disableIfEmpty: true,
+                        selectAllName: false,
+                        allSelectedText: '科目选择数',
+                        filterPlaceholder: '搜索科目'
+                    }
+            )
+
+            $('a[href*=#]').click(function () {
+                if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+                    var $target = $(this.hash);
+                    $.each($("#topMenu a"), function (i, ele) {
+                        if ($(ele).hasClass("top_menu_active")) {
+                            $(ele).removeClass("top_menu_active");
+                        }
+                    });
+                    if ($target.attr("id") == 'toppics') {
+                        $("#topMenu #mainPage").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block1') {
+                        $("#topMenu #courseSystem").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block2') {
+                        $("#topMenu #courseFeature").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block3') {
+                        $("#topMenu #courseContent").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block4') {
+                        $("#topMenu #teachMode").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block5') {
+                        $("#topMenu #teachIdea").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block6') {
+                        $("#topMenu #trainFlow").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block7') {
+                        $("#topMenu #schoolQuery").addClass("top_menu_active");
+                    }
+                    ;
+
+                    $.each($("#topMenu2 a"), function (i, ele) {
+                        if ($(ele).hasClass("top_menu_active")) {
+                            $(ele).removeClass("top_menu_active");
+                        }
+                    });
+                    if ($target.attr("id") == 'toppics') {
+                        $("#topMenu2 #mainPage").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block1') {
+                        $("#topMenu2 #courseSystem").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block2') {
+                        $("#topMenu2 #courseFeature").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block3') {
+                        $("#topMenu2 #courseContent").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block4') {
+                        $("#topMenu2 #teachMode").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block5') {
+                        $("#topMenu2 #teachIdea").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block6') {
+                        $("#topMenu2 #trainFlow").addClass("top_menu_active");
+                    } else if ($target.attr("id") == 'block7') {
+                        $("#topMenu2 #schoolQuery").addClass("top_menu_active");
+                    }
+                    ;
+
+                    $target = $target.length && $target || $('[name=' + this.hash.slice(1) + ']');
+                    if ($target.length) {
+                        var targetOffset = $target.offset().top;
+                        $('html,body').animate({
+                                    scrollTop: targetOffset
+                                },
+                                1000);
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+</block>
+<block name="footer">
+    <div style="float:left; margin-top:20px;width: 100%">
+        <include file="common/footer"/>
+    </div>
+</block>

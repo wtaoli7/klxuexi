@@ -1,0 +1,91 @@
+<style>
+    .top_menu {
+        font-family: "微软雅黑", "宋体", Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        color: #CCCCCC;
+    }
+
+    .top_menu .logo_img {
+        width: 100px;
+        height: 70px;
+    }
+
+    .top_menu ul li {
+        float: left;
+        line-height: 104px;
+        margin-left: 10px;
+        margin-right: 10px;
+        list-style-type: none;
+    }
+
+    .top_menu ul li a {
+        padding: 3px;
+    }
+
+    .search {
+        border: 1px solid #CCCCCC;
+        height: 30px;
+        width: 200px;
+        float: right;
+        margin-top: 35px;
+    }
+
+    .search .input {
+        border: none;
+        height: 27px;
+        width: 160px;
+        float: left;
+    }
+
+    .search .btn {
+        width: 38px;
+        border: none;
+        text-align: center;
+    }
+
+    .top_menu_active {
+        border-bottom: 4px solid red;
+    }
+
+    .top_menu ul li a:hover {
+        border-bottom: 4px solid red;
+    }
+</style>
+<div style="width:100%;height:auto;min-height:104px;">
+    <div class="container top_menu">
+        <div class="row">
+            <div class="col-lg-1 col-md-1 col-sm-2 col-xs-2 fl" style="line-height:104px;">
+                <a href="__ROOT__/index.php/Home/Index/<?php echo $_SESSION['city'];?>">
+                    <img src="__PUBLIC__/images/logo.png" class="logo_img"/>
+                </a>
+            </div>
+            <div class="col-lg-8 col-md-8 col-sm-7 col-xs-5 ">
+                <ul style="width:100%;">
+                    <li><a href="{:U('Index/dxb')}" id="mainPage">首页</a></li>
+                    <li><a href="{:U('Article/latestNews')}" id="latestNews">最新资讯</a></li>
+                    <li><a href="{:U('Course/home')}" id="searchCourse">课程搜索</a></li>
+                    <li><a href="{:U('Teacher/index')}" id="starTeacher">星级名师</a></li>
+                    <li><a href="{:U('School/index')}" id="schoolInfo">分校信息</a></li>
+                    <if condition="session('onlineOrder')">
+                        <li><a href="{:U('Course/onlineOrderIndex')}" id="onlineOrder">网上报名</a></li>
+                    </if>
+                    <li><a href="{:U('Article/connectUs')}" id="connectUs">联系我们</a></li>
+                    <li><a href="{:U('Article/aboutUs')}" id="aboutUs">关于我们</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2  col-md-2 col-sm-3 col-xs-5 fr">
+                <div class="search">
+                    <input type="text" class="input" value="{$keywords}" placeholder="课程、老师、校区"/>
+                    <i class="fa fa-search btn" onclick="search()"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function search() {
+        var keywords = $('.search .input' +
+                '').val();
+        location.href = "{:U('Search/search')}" + "?keywords=" + keywords;
+    }
+</script>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <include file="common/css"/>
+    <include file="common/js"/>
+    <script type="text/javascript">
+        //        $("#test").change(function () {
+        //            //获取第一个option的值
+        ////            var first = $('#test option:first').val();
+        ////            alert(first);
+        //            alert();
+        //        });
+
+        $(function () {
+            // 全选
+            $("#btnCheckAll").bind("click", function () {
+                $("[name = chkItem]:checkbox").prop("checked", true);
+            });
+
+            // 全不选
+            $("#btnCheckNone").bind("click", function () {
+                $("[name = chkItem]:checkbox").prop("checked", false);
+            });
+
+            // 反选
+            $("#btnCheckReverse").bind("click", function () {
+                $("[name = chkItem]:checkbox").each(function () {
+//                    alert($(this).is(":checked"));
+                    $(this).prop("checked", !$(this).is(":checked"));
+                });
+            });
+
+            // 全不选
+            $("#btnSubmit").bind("click", function () {
+                var result = new Array();
+                $("[name = chkItem]:checkbox").each(function () {
+                    if ($(this).is(":checked")) {
+                        result.push($(this).attr("value"));
+                    }
+                });
+
+                alert(result.join(","));
+            });
+        });
+    </script>
+    <title>快乐学习官网|分校信息</title>
+</head>
+<body>
+<div style="margin: 100px">
+    <div>
+        <input name="chkItem" type="checkbox" value="今日话题" style="margin: 10px"/>今日话题
+        <input name="chkItem" type="checkbox" value="视觉焦点" style="margin: 10px"/>视觉焦点
+        <input name="chkItem" type="checkbox" value="财经" style="margin: 10px"/>财经
+        <input name="chkItem" type="checkbox" value="汽车" style="margin: 10px"/>汽车
+        <input name="chkItem" type="checkbox" value="科技" style="margin: 10px"/>科技
+        <input name="chkItem" type="checkbox" value="房产" style="margin: 10px"/>房产
+        <input name="chkItem" type="checkbox" value="旅游" style="margin: 10px"/>旅游
+    </div>
+    <br>
+    <div>
+        <input id="btnCheckAll" type="button" value="全选"/>
+        <input id="btnCheckNone" type="button" value="全不选"/>
+        <input id="btnCheckReverse" type="button" value="反选"/>
+        <input id="btnSubmit" type="button" value="提交"/>
+    </div>
+</div>
+</body>
+</html>

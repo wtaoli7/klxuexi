@@ -1,0 +1,55 @@
+<script type="text/javascript">
+    $(function () {
+        if ({$showCity}) {
+            $('#myModal').modal('show');
+        }
+    });
+</script>
+<!-- 城市选择模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true" style="z-index: 10001;" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <empty name="Think.session.city">
+                    <else/>
+                </empty>
+                <h4 class="modal-title" id="myModalLabel">
+                    推荐城市：
+                    <a class="btn btn-danger" href="__ROOT__/index.php/Home/Index/{$recommCityCode}">
+                        {$recommCity}
+                    </a>
+                    <empty name="Think.session.city">
+                        <a class="btn btn-default fr" style="margin-left: 340px;" href="__ROOT__/index.php/Home/Index/modalCanel">
+                            确定
+                        </a>
+                        <else/>
+                        <button type="button" class="btn btn-default fr"
+                                data-dismiss="modal" style="margin-left: 340px;">确定
+                        </button>
+                    </empty>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <a class="btn" href="__ROOT__/index.php/Home/Index/xiamen">
+                    厦门
+                </a>
+                <a class="btn" href="__ROOT__/index.php/Home/Index/fuzhou">
+                    福州
+                </a>
+                <a class="btn" href="__ROOT__/index.php/Home/Index/quanzhou">
+                    泉州
+                </a>
+                <a class="btn" href="__ROOT__/index.php/Home/Index/nanchang">
+                    南昌
+                </a>
+                <a class="btn" href="__ROOT__/index.php/Home/Index/hefei">
+                    合肥
+                </a>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
